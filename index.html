@@ -73,7 +73,7 @@
             object-fit: cover;
         }
 
-        /* Fallback logo display if video isn't loaded yet */
+        /* Fallback logo display */
         .splash-fallback-logo {
             position: absolute;
             display: flex;
@@ -81,15 +81,23 @@
             align-items: center;
             gap: 15px;
             animation: pulseLogo 2s infinite ease-in-out;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+            z-index: 2;
+        }
+
+        .splash-fallback-logo.hidden-logo {
+            opacity: 0 !important;
+            visibility: hidden !important;
+            pointer-events: none;
         }
 
         .splash-fallback-logo img {
             max-width: 120px;
-            filter: invert(1); /* Inverts black logo to crisp white */
+            filter: invert(1);
         }
 
         @keyframes pulseLogo {
-            0%, 100% { transform: scale(1); opacity: 0.8; }
+            0%, 100% { transform: scale(1); opacity: 0.85; }
             50% { transform: scale(1.05); opacity: 1; }
         }
 
@@ -135,7 +143,6 @@
             justify-content: space-between; align-items: center; padding: 18px 24px;
         }
 
-        /* Logo Styling */
         .logo-brand {
             display: flex;
             align-items: center;
@@ -148,7 +155,7 @@
             height: 38px;
             width: auto;
             object-fit: contain;
-            filter: invert(1); /* Turns black logo white for dark theme */
+            filter: invert(1);
             transition: var(--transition);
         }
 
@@ -204,7 +211,7 @@
         /* Banner Hero */
         .hero-banner {
             text-align: center;
-            margin-bottom: 60px;
+            margin-bottom: 50px;
             padding: 40px 0;
             border-bottom: 1px solid var(--border-color);
         }
@@ -226,6 +233,35 @@
             font-weight: 700;
         }
 
+        /* Filter Pills */
+        .category-filters {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .filter-pill {
+            background: #111111;
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .filter-pill:hover, .filter-pill.active {
+            background: #ffffff;
+            color: #000000;
+            border-color: #ffffff;
+        }
+
         /* Products Grid */
         .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 32px; }
         .product-card {
@@ -235,6 +271,22 @@
         .product-card:hover { transform: translateY(-8px); border-color: var(--border-hover); box-shadow: 0 20px 40px rgba(255,255,255,0.06); }
         .product-img { width: 100%; height: 380px; object-fit: cover; background: #080808; filter: grayscale(30%); transition: var(--transition); }
         .product-card:hover .product-img { filter: grayscale(0%); transform: scale(1.03); }
+        
+        .product-tag {
+            position: absolute;
+            top: 14px;
+            left: 14px;
+            background: rgba(0,0,0,0.8);
+            border: 1px solid var(--border-color);
+            color: #fff;
+            padding: 4px 10px;
+            font-size: 0.65rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            backdrop-filter: blur(8px);
+        }
+
         .product-info { padding: 22px; text-align: left; background: var(--bg-card); border-top: 1px solid var(--border-color); }
         .p-cat { color: var(--text-muted); font-size: 0.7rem; text-transform: uppercase; font-weight: 700; letter-spacing: 2px; }
         .p-title { font-size: 1.15rem; font-weight: 800; margin: 6px 0; color: #fff; text-transform: uppercase; letter-spacing: 0.5px; }
@@ -303,11 +355,6 @@
     <!-- VIDEO / LOGO INTRO SPLASH OVERLAY -->
     <div id="splash-screen">
         <div class="splash-video-container">
-            <!-- 
-                VIDEO EMBED:
-                1. Put your video file 'logo-animation.mp4' in your folder.
-                2. If the video fails to load or hasn't been uploaded yet, the fallback logo displays.
-            -->
             <video id="intro-video" class="splash-video" autoplay muted playsinline onended="closeSplash()">
                 <source src="logo-animation.mp4" type="video/mp4">
             </video>
@@ -325,7 +372,6 @@
 
     <header>
         <div class="nav-container">
-            <!-- Brand Logo Integration -->
             <div class="logo-brand" onclick="navigate('home')">
                 <img src="logo.png" alt="IT'S SOOPER" class="logo-img" onerror="this.onerror=null; this.src='https://via.placeholder.com/40/000000/FFFFFF?text=IS';">
                 <div class="logo-text-title">ITS SOOPER <span>LIMITED</span></div>
@@ -348,7 +394,14 @@
     <div id="page-home" class="page active">
         <div class="hero-banner">
             <h2 class="hero-title">ARCHIVE .01</h2>
-            <p class="hero-sub">Heavyweight Monograms & Technical Hardware</p>
+            <p class="hero-sub">Heavyweight Monograms & Technical Apparel</p>
+        </div>
+
+        <div class="category-filters">
+            <button class="filter-pill active" onclick="filterCategory('all', this)">All Items</button>
+            <button class="filter-pill" onclick="filterCategory('tees', this)">Graphic Tees</button>
+            <button class="filter-pill" onclick="filterCategory('hoodies', this)">Hoodies & Outerwear</button>
+            <button class="filter-pill" onclick="filterCategory('hardware', this)">Hardware & Cases</button>
         </div>
         
         <div class="products-grid" id="main-grid">
@@ -477,7 +530,8 @@
             { 
                 id: 1, 
                 name: "FEIN Heavyweight Graphic Tee", 
-                category: "Graphic Tee", 
+                category: "tees", 
+                tag: "Best Seller",
                 price: 34.99, 
                 desc: "Rage aesthetic meets premium construction. 280gsm ultra-heavyweight cotton canvas featuring high-contrast 'FEIN' typography. Drop shoulder, oversized boxy fit. Printed with crack-resistant plastisol ink.",
                 img: "https://images.unsplash.com/photo-1576566588028-4147f3842f27?auto=format&fit=crop&w=800&q=80" 
@@ -485,28 +539,87 @@
             { 
                 id: 2, 
                 name: "Dark Knight Vintage Wash Tee", 
-                category: "Vintage Wash", 
+                category: "tees", 
+                tag: "Acid Wash",
                 price: 38.99, 
                 desc: "A tribute to the shadows. Heavily acid-washed for a charcoal grey, broken-in vintage feel. Features a distressed bat motif on the chest. Raw hem detailing.",
                 img: "https://images.unsplash.com/photo-1503342394128-c104d54dba01?auto=format&fit=crop&w=800&q=80" 
             },
             { 
                 id: 3, 
+                name: "Rage Cyberpunk Heavy Fleece Hoodie", 
+                category: "hoodies", 
+                tag: "Heavyweight",
+                price: 54.99, 
+                desc: "400gsm brushed-back cotton fleece hoodie. Engineered for warmth and structured drape. Features oversized double-lined hood and monochrome high-density back print.",
+                img: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?auto=format&fit=crop&w=800&q=80" 
+            },
+            { 
+                id: 4, 
                 name: "Minimalist Aesthetic Line Art Tee", 
-                category: "Aesthetic Tee", 
+                category: "tees", 
+                tag: "Core Drop",
                 price: 29.99, 
                 desc: "Stark contrast and clean lines. Made from 100% combed ringspun cotton for an ultra-soft drape. Features subtle, fine-line white geometric art centered on a pitch-black canvas.",
                 img: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=800&q=80" 
             },
             { 
-                id: 4, 
-                name: "Custom Monogram Phone Case", 
-                category: "Hardware", 
+                id: 5, 
+                name: "Velocity Boxy Drop-Shoulder Tee", 
+                category: "tees", 
+                tag: "New Arrival",
+                price: 32.99, 
+                desc: "Minimalist chest embroidery paired with bold rear archival text. Pre-shrunk 260gsm jersey cotton tailored specifically for a high-fashion streetwear relaxed silhouette.",
+                img: "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=800&q=80" 
+            },
+            { 
+                id: 6, 
+                name: "Gotham Shadow Acid Zip Hoodie", 
+                category: "hoodies", 
+                tag: "Limited Drop",
+                price: 59.99, 
+                desc: "Custom silver metal dual zipper on heavily mineral-washed black fleece. Custom IS crest embroidered on the chest. Ribbed side panels for unrestricted movement.",
+                img: "https://images.unsplash.com/photo-1509967419530-da38b4704bc6?auto=format&fit=crop&w=800&q=80" 
+            },
+            { 
+                id: 7, 
+                name: "Custom Monogram Matte Phone Case", 
+                category: "hardware", 
+                tag: "Bespoke",
                 price: 18.99, 
-                desc: "Stealth mode engaged. A matte black, shock-absorbent TPU border paired with a hardened polycarbonate backplate. Personalize with your initials or a photo upload during fulfillment.",
+                desc: "Stealth mode engaged. A matte black, shock-absorbent TPU border paired with a hardened polycarbonate backplate. Personalize with your initials or a photo upload.",
                 img: "https://images.unsplash.com/photo-1580910051074-3eb694886505?auto=format&fit=crop&w=800&q=80" 
+            },
+            { 
+                id: 8, 
+                name: "Matrix Tempered Glass Photo Case", 
+                category: "hardware", 
+                tag: "Scratch-Proof",
+                price: 19.99, 
+                desc: "Ultra-hard 9H scratch-resistant tempered glass backplate. High-definition monochrome particle print beneath the glass layer. Raised camera lip protection.",
+                img: "https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?auto=format&fit=crop&w=800&q=80" 
             }
         ];
+
+        // LOGO DISAPPEAR LOGIC: When video starts playing, hide fallback logo
+        const introVideo = document.getElementById('intro-video');
+        const fallbackLogo = document.getElementById('fallback-logo');
+
+        if (introVideo) {
+            // As soon as the video starts actually playing frames
+            introVideo.addEventListener('playing', () => {
+                if (fallbackLogo) {
+                    fallbackLogo.classList.add('hidden-logo');
+                }
+            });
+
+            // Also check on play event
+            introVideo.addEventListener('play', () => {
+                if (fallbackLogo) {
+                    fallbackLogo.classList.add('hidden-logo');
+                }
+            });
+        }
 
         // Close Splash Video / Intro
         function closeSplash() {
@@ -519,18 +632,32 @@
             closeSplash();
         }, 6000);
 
-        // Render Home Grid
-        const grid = document.getElementById('main-grid');
-        grid.innerHTML = products.map(p => `
-            <div class="product-card" onclick="openDetails(${p.id})">
-                <img src="${p.img}" alt="${p.name}" class="product-img">
-                <div class="product-info">
-                    <span class="p-cat">${p.category}</span>
-                    <h3 class="p-title">${p.name}</h3>
-                    <span class="p-price">£${p.price.toFixed(2)}</span>
+        // Render Products
+        function renderProducts(items) {
+            const grid = document.getElementById('main-grid');
+            grid.innerHTML = items.map(p => `
+                <div class="product-card" onclick="openDetails(${p.id})">
+                    <span class="product-tag">${p.tag}</span>
+                    <img src="${p.img}" alt="${p.name}" class="product-img">
+                    <div class="product-info">
+                        <span class="p-cat">${p.category}</span>
+                        <h3 class="p-title">${p.name}</h3>
+                        <span class="p-price">£${p.price.toFixed(2)}</span>
+                    </div>
                 </div>
-            </div>
-        `).join('');
+            `).join('');
+        }
+
+        function filterCategory(cat, btn) {
+            document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            if (cat === 'all') {
+                renderProducts(products);
+            } else {
+                renderProducts(products.filter(p => p.category === cat));
+            }
+        }
 
         // Navigation Engine
         function navigate(pageId) {
@@ -563,7 +690,7 @@
                     <span class="details-price">£${product.price.toFixed(2)}</span>
                     <p class="details-desc">${product.desc}</p>
                     
-                    ${product.category.includes('Tee') || product.category.includes('Wash') ? `
+                    ${product.category === 'tees' || product.category === 'hoodies' ? `
                     <div class="size-selector">
                         <h4>Select Size</h4>
                         <div class="size-btns">
@@ -605,6 +732,9 @@
             document.querySelector('.cart-count').innerText = "0";
             navigate('home');
         }
+
+        // Initial Load
+        renderProducts(products);
     </script>
 </body>
 </html>
